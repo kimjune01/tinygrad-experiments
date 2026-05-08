@@ -14,9 +14,9 @@ Investigator's machine: Windows, OpenCL default (no CUDA installed). Codex unava
 | H₁  | Omission is deliberate — `is_dtype_supported` excludes bf16 on PTX      | confirmed   | deduction | 95%  |
 | H₂  | Test guard relies on `is_dtype_supported`, which should skip the case   | killed by user observation | deduction | 90% |
 | H₃  | `CUDARenderer` init fails on user's box → `PTXRenderer` silent fallback → check/renderer mismatch | confirmed (induction, RTX 4080) | induction | 99% |
-| H₄  | Fix A: add `dtypes.bfloat16: "bf16"` to PTX `types` + `mem_types`(b16)  | open        | deduction | 70%  |
-| H₅  | Fix B: extend `ptx_matcher` to upcast bf16 ALU → f32 (mirror half rule) | open        | deduction | 75%  |
-| H₆  | Fix C: tighten `is_dtype_supported` to query the *selected* renderer    | open        | deduction | 80%  |
+| H₄  | Fix A: add `dtypes.bfloat16: "bf16"` to PTX `types` + `mem_types`(b16)  | killed (dominated) | deduction | n/a |
+| H₅  | Fix B: extend `ptx_matcher` to upcast bf16 ALU → f32 (mirror half rule) | open (deferred — feature work, not this PR) | deduction | 75% |
+| H₆  | Fix C: tighten `is_dtype_supported` to query the *selected* renderer    | confirmed & shipped (PR #16108) | induction | 99% |
 
 ## H₀ — PTX `types` dict has no bfloat16 entry
 
@@ -139,7 +139,9 @@ python -c "from tinygrad import Device; r = Device[Device.DEFAULT].renderer; \
 ## Pruning log
 
 - H₂ killed by user observation — the test guard is necessary but not sufficient.
-- H₄ (fix A alone) shouldn't ship — moves crash from Python to PTX assembler, no real improvement.
+- H₄ (fix A alone) killed — dominated by H₅. Adds bf16 to the type tables but leaves PTX without ALU support, so any real bf16 kernel still fails (now at the assembler instead of the renderer). No standalone value.
+- H₆ (fix C) confirmed and shipped as tinygrad PR [#16108](https://github.com/tinygrad/tinygrad/pull/16108) — diff matches local, end-to-end repro on RTX 4080 (master fails, branch passes), CI pending.
+- H₅ (fix B) deferred — genuine bf16 PTX support is feature work, not a bug fix. Worth filing as a separate issue against tinygrad if real bf16 kernels on PTX are wanted (vs. the current "unsupported, skipped" contract that fix C now correctly enforces).
 
 ## Phase 5–7 (executed on local branch `fix-c-ptx-bf16-support-check`)
 
