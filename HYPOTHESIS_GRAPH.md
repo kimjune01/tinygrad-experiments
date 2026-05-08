@@ -467,6 +467,25 @@ But even for SQUARE matmuls, the BEAM-style opts are better: 154us vs 313us (-50
 
 **The fix (2 lines):** Replace the post-TC UPCAST/LOCAL on lines 39-45 with UPCAST(axis=1) + UNROLL(axis=0).
 
+### H0.5 — CUDA-renderer validation (2026-05-08, post-discovery)
+
+A prior bench file ([CUDA_BENCH_RESULTS.md](CUDA_BENCH_RESULTS.md)) reported "kernel shapes identical between baseline and fix on RTX 4080" and was used to label PR #16107 "CUDA neutral." That bench was actually run on `PTXRenderer` because NVRTC was missing — the silent CUDARenderer→PTXRenderer fallback documented in [tinygrad#16112](https://github.com/tinygrad/tinygrad/issues/16112) (and adjacent to [#16108](https://github.com/tinygrad/tinygrad/pull/16108)).
+
+Re-run with NVRTC installed and `CUDARenderer` confirmed active — full results in [CUDA_FP16_VALIDATION.md](CUDA_FP16_VALIDATION.md):
+
+- **fp32 (CUDA):** kernel shapes identical to master across all three test shapes. Trivially neutral — TC requires fp16/bf16, so the post-TC code path the PR modifies is never executed for fp32 inputs. The original "neutral" claim is correct but uninformative.
+- **fp16 (CUDA):**
+
+| Shape | Master μs | Master GFLOPS | PR μs | PR GFLOPS | Speedup |
+|---|---|---|---|---|---|
+| 16×4096 × 4096×4096 | 223 | 2405 | **66.6** | **8066** | **3.35×** |
+| 256×256 × 256×256 | 42.9 | 781 | 45.1 | 745 | ~neutral (noise) |
+| 8×2048 × 2048×2048 | 122.6 | 547 | 117.5 | 571 | ~neutral (TC didn't fire — same kernel) |
+
+The 16×4096 case is the headline: real CUDA, real fp16, **3.35× speedup**. Same-direction-as-Metal evidence that the post-TC fix is a quality improvement, not just architectural symmetry. PR description should be updated to reflect the fp16 win — current "neutral" framing hides the actual result.
+
+Open subhypothesis: TC doesn't fire on the 8×2048 fp16 shape on PTX/CUDA — kernel name is identical to the fp32 version and to master. Worth a separate edge if closing all gaps matters.
+
 ### H0.6: AMD gfx1201 regression — UNROLL(0,4) produces incorrect WMMA results
 
 **Status:** CONFIRMED — the fix is AMD-unsafe
