@@ -39,7 +39,19 @@
 18 passed, 7 skipped, 2 deselected, 1 xfailed in 2.13s
 ```
 
-2 tests deselected (`test_arg_acc_dtype`, `test_sum_acc_dtype`) — both fail with `KeyError: dtypes.bfloat16` in the PTX renderer. Confirmed pre-existing: same failure on `skip-root-op-check` baseline. Not caused by the PR.
+2 tests deselected (`test_arg_acc_dtype`, `test_sum_acc_dtype`) — both fail with `KeyError: dtypes.bfloat16` in the PTX renderer at `ptx.py:183`. The `self.types` dict in the PTX renderer has no entry for `dtypes.bfloat16`, so any LOAD op with bfloat16 dtype crashes during SSA name generation.
+
+### Pre-existing bug evidence
+
+Same 2 tests fail identically on all three branches:
+
+| Branch | Result |
+|---|---|
+| `master` (upstream) | 2 failed (`KeyError: dtypes.bfloat16`) |
+| `skip-root-op-check` (baseline) | 2 failed (`KeyError: dtypes.bfloat16`) |
+| `post-tc-upcast-fix` (fix) | 2 failed (`KeyError: dtypes.bfloat16`) |
+
+This is an upstream tinygrad bug in `tinygrad/renderer/ptx.py` — not introduced by PR #16104.
 
 ## Conclusion
 
