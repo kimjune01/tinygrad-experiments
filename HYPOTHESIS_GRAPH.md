@@ -524,7 +524,7 @@ The old heuristic's UPCAST M+N pattern works because it matches the structure th
 
 **Open edges (testable via CI):**
 - H0.6b: ★ CONFIRMED (2026-05-08). `UPCAST(0,2) + UPCAST(1,2) + UNROLL(0,2)` passes both gfx1201 CI jobs (amd and amdllvm). Axis coverage is the constraint — both operand axes must be upcasted to preserve the swizzle lane mapping.
-- H0.6c: Now testable — try `UPCAST(0,2) + UPCAST(1,2) + UNROLL(0,4)` on gfx12. If UNROLL(0,4) is safe when both axes are covered, the full speedup applies to RDNA4 too.
+- H0.6c: KILLED (2026-05-08). `UPCAST(0,2) + UPCAST(1,2) + UNROLL(0,4)` fails on amdllvm gfx1201. UNROLL(0,4) is unsafe on RDNA4 regardless of axis coverage. The safe ceiling is UNROLL(0,2). Two independent constraints: (1) both operand axes must be upcasted (H0.6b), (2) UNROLL factor must be ≤2 on RDNA4 (H0.6c kill). The original register-pressure theory was partially right after all — UNROLL(0,4) does exceed some RDNA4 limit, but the mechanism is lane mapping, not simple register count.
 - H0.6d: Strongly supported by H0.6b. The rule is: post-TC UPCAST must cover all operand axes that appear in `tc.opts`. N-only violates it; both-axis preserves it. Needs testing on CDNA (gfx950) to confirm generality.
 
-**Resolution (updated):** PR #16109 proves gfx12 CAN benefit from the new opts when both axes are upcasted. The conservative fallback in #16107 is no longer necessary — gfx12 should get `UPCAST(0,2) + UPCAST(1,2) + UNROLL(0,2)` instead of the old heuristic. Next perturbation: try UNROLL(0,4) on gfx12 with both-axis coverage.
+**Resolution (final):** gfx12 gets `UPCAST(0,2) + UPCAST(1,2) + UNROLL(0,2)`. All other backends get `UPCAST(1,2) + UNROLL(0,4)`. The gfx12 path is better than the old heuristic (adds UNROLL(0,2) which the old code didn't have) but can't go to UNROLL(0,4). Frontier is closed for this investigation.
