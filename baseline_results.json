@@ -1,0 +1,2154 @@
+{
+  "beam_amt": 2,
+  "cnt": 4,
+  "results": {
+    "gemm_1024": {
+      "heur_ms": 1.8801464757416397,
+      "heur_kernels": 1,
+      "beam_ms": 1.7117705137934536,
+      "beam_vs_heur": 0.9104452955550876,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.166643626987934,
+              "improved": true,
+              "wall_s": 0.14119062497047707,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.166643626987934,
+              "improved": false,
+              "wall_s": 0.036063583043869585,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2436633330071345,
+          "final_us": 7.166643626987934,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.499998901039362,
+              "improved": true,
+              "wall_s": 0.16901100001996383,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.499998901039362,
+              "improved": false,
+              "wall_s": 0.035108375013805926,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.27053662500111386,
+          "final_us": 7.499998901039362,
+          "final_opts": [
+            "Opt(op=OptOps.UPCAST, axis=0, arg=0)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 74.8750171624124,
+              "improved": true,
+              "wall_s": 0.2854198749992065,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 70.50001295283437,
+              "improved": true,
+              "wall_s": 0.33332754200091586,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 17,
+              "compiled": 16,
+              "timed": 16,
+              "best_us": 70.50001295283437,
+              "improved": false,
+              "wall_s": 0.35876591701526195,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 43,
+          "total_timed": 41,
+          "search_wall_s": 1.1106276669888757,
+          "final_us": 70.50001295283437,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 6.999995093792677,
+              "improved": true,
+              "wall_s": 0.13599712500581518,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 6.999995093792677,
+              "improved": false,
+              "wall_s": 0.030426917015574872,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2328118330333382,
+          "final_us": 6.999995093792677,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 25,
+              "compiled": 25,
+              "timed": 24,
+              "best_us": 366.1250229924917,
+              "improved": true,
+              "wall_s": 0.4239954589866102,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 39,
+              "compiled": 39,
+              "timed": 39,
+              "best_us": 204.7916641458869,
+              "improved": true,
+              "wall_s": 0.3431151669938117,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 29,
+              "compiled": 29,
+              "timed": 28,
+              "best_us": 148.8333218730986,
+              "improved": true,
+              "wall_s": 0.2514217920252122,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 28,
+              "compiled": 28,
+              "timed": 27,
+              "best_us": 148.8333218730986,
+              "improved": false,
+              "wall_s": 0.2863492500036955,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 4,
+          "total_candidates": 121,
+          "total_timed": 118,
+          "search_wall_s": 1.4249785419669934,
+          "final_us": 148.8333218730986,
+          "final_opts": [
+            "Opt(op=OptOps.TC, axis=0, arg=(-1, 0, 1))",
+            "Opt(op=OptOps.UPCAST, axis=1, arg=4)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=8)"
+          ]
+        }
+      ]
+    },
+    "gemm_256": {
+      "heur_ms": 1.2329164892435074,
+      "heur_kernels": 1,
+      "beam_ms": 0.8656664867885411,
+      "beam_vs_heur": 0.7021290528117574,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.374968845397234,
+              "improved": true,
+              "wall_s": 0.14654250000603497,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.374968845397234,
+              "improved": false,
+              "wall_s": 0.03724929102463648,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2539461249834858,
+          "final_us": 7.374968845397234,
+          "final_opts": [
+            "Opt(op=OptOps.UPCAST, axis=0, arg=0)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.249996997416019,
+              "improved": true,
+              "wall_s": 0.13321766699664295,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.249996997416019,
+              "improved": false,
+              "wall_s": 0.03396095801144838,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.23516558296978474,
+          "final_us": 7.249996997416019,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 14.833349268883467,
+              "improved": true,
+              "wall_s": 0.2138129590312019,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 14.124962035566568,
+              "improved": true,
+              "wall_s": 0.2591215000138618,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 18,
+              "compiled": 18,
+              "timed": 17,
+              "best_us": 14.124962035566568,
+              "improved": false,
+              "wall_s": 0.1261014579795301,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 44,
+          "total_timed": 42,
+          "search_wall_s": 0.7292646669666283,
+          "final_us": 14.124962035566568,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=4)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.125025149434805,
+              "improved": true,
+              "wall_s": 0.13789366598939523,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.125025149434805,
+              "improved": false,
+              "wall_s": 0.03256087499903515,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.238794082950335,
+          "final_us": 7.125025149434805,
+          "final_opts": [
+            "Opt(op=OptOps.UPCAST, axis=0, arg=0)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 25,
+              "compiled": 25,
+              "timed": 23,
+              "best_us": 25.20834095776081,
+              "improved": true,
+              "wall_s": 0.22587599995313212,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 38,
+              "compiled": 38,
+              "timed": 37,
+              "best_us": 9.125040378421545,
+              "improved": true,
+              "wall_s": 0.08089925005333498,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 25,
+              "compiled": 25,
+              "timed": 24,
+              "best_us": 9.125040378421545,
+              "improved": false,
+              "wall_s": 0.2860337920137681,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 88,
+          "total_timed": 84,
+          "search_wall_s": 0.7157369999913499,
+          "final_us": 9.125040378421545,
+          "final_opts": [
+            "Opt(op=OptOps.TC, axis=0, arg=(-1, 0, 1))",
+            "Opt(op=OptOps.UNROLL, axis=0, arg=0)"
+          ]
+        }
+      ]
+    },
+    "add_4096": {
+      "heur_ms": 1.3032920251134783,
+      "heur_kernels": 1,
+      "beam_ms": 1.3401044998317957,
+      "beam_vs_heur": 1.0282457607420041,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.375027053058147,
+              "improved": true,
+              "wall_s": 0.1524713750113733,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.375027053058147,
+              "improved": false,
+              "wall_s": 0.03679862496210262,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.25981224997667596,
+          "final_us": 7.375027053058147,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 1382.0002786815166,
+              "improved": true,
+              "wall_s": 0.32877720799297094,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 977.6250226423144,
+              "improved": true,
+              "wall_s": 0.3548217079951428,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 16,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 977.6250226423144,
+              "improved": false,
+              "wall_s": 0.36153850000118837,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 42,
+          "total_timed": 39,
+          "search_wall_s": 1.1770312080043368,
+          "final_us": 977.6250226423144,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.333292160183191,
+              "improved": true,
+              "wall_s": 0.14574620802886784,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.333292160183191,
+              "improved": false,
+              "wall_s": 0.034467042016331106,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.24710812495322898,
+          "final_us": 7.333292160183191,
+          "final_opts": [
+            "Opt(op=OptOps.UPCAST, axis=0, arg=0)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.083290256559849,
+              "improved": true,
+              "wall_s": 0.12796054204227403,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.083290256559849,
+              "improved": false,
+              "wall_s": 0.030621665995568037,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.22270075004780665,
+          "final_us": 7.083290256559849,
+          "final_opts": [
+            "Opt(op=OptOps.UPCAST, axis=0, arg=0)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 959.0000845491886,
+              "improved": true,
+              "wall_s": 0.1514386250055395,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 19,
+              "timed": 19,
+              "best_us": 242.9999876767397,
+              "improved": true,
+              "wall_s": 0.11408304201904684,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 18,
+              "compiled": 18,
+              "timed": 16,
+              "best_us": 212.5001046806574,
+              "improved": true,
+              "wall_s": 0.09707370901014656,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 19,
+              "compiled": 19,
+              "timed": 18,
+              "best_us": 212.5001046806574,
+              "improved": false,
+              "wall_s": 0.12784541700966656,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 4,
+          "total_candidates": 63,
+          "total_timed": 60,
+          "search_wall_s": 0.5993660420062952,
+          "final_us": 212.5001046806574,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)",
+            "Opt(op=OptOps.UPCAST, axis=0, arg=2)",
+            "Opt(op=OptOps.UPCAST, axis=1, arg=4)"
+          ]
+        }
+      ]
+    },
+    "mul_sum": {
+      "heur_ms": 2.362791507039219,
+      "heur_kernels": 3,
+      "beam_ms": 1.479354512412101,
+      "beam_vs_heur": 0.6261045496417327,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.375027053058147,
+              "improved": true,
+              "wall_s": 0.13708154199412093,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.375027053058147,
+              "improved": false,
+              "wall_s": 0.03712612495291978,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.24182624998502433,
+          "final_us": 7.375027053058147,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.166643626987934,
+              "improved": true,
+              "wall_s": 0.13501070899656042,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.166643626987934,
+              "improved": false,
+              "wall_s": 0.03528345900122076,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.23561820795293897,
+          "final_us": 7.166643626987934,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 1376.0002329945564,
+              "improved": true,
+              "wall_s": 0.2117801250424236,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 975.5416540428996,
+              "improved": true,
+              "wall_s": 0.26946112496079877,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 16,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 975.5416540428996,
+              "improved": false,
+              "wall_s": 0.21526058303425089,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 42,
+          "total_timed": 39,
+          "search_wall_s": 0.8260931670083664,
+          "final_us": 975.5416540428996,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.249996997416019,
+              "improved": true,
+              "wall_s": 0.13924637500895187,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.249996997416019,
+              "improved": false,
+              "wall_s": 0.03567625000141561,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2453908750321716,
+          "final_us": 7.249996997416019,
+          "final_opts": [
+            "Opt(op=OptOps.UPCAST, axis=0, arg=0)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 15,
+              "compiled": 15,
+              "timed": 15,
+              "best_us": 232.12499218061566,
+              "improved": true,
+              "wall_s": 0.29146016598679125,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 24,
+              "compiled": 24,
+              "timed": 21,
+              "best_us": 232.12499218061566,
+              "improved": false,
+              "wall_s": 0.18730445799883455,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 39,
+          "total_timed": 36,
+          "search_wall_s": 0.5953817500267178,
+          "final_us": 232.12499218061566,
+          "final_opts": [
+            "Opt(op=OptOps.GROUPTOP, axis=0, arg=256)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 13,
+              "compiled": 13,
+              "timed": 12,
+              "best_us": 7.458322215825319,
+              "improved": true,
+              "wall_s": 0.1884152910206467,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 32,
+              "compiled": 32,
+              "timed": 30,
+              "best_us": 7.375027053058147,
+              "improved": true,
+              "wall_s": 0.12648637499660254,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 22,
+              "compiled": 22,
+              "timed": 21,
+              "best_us": 7.375027053058147,
+              "improved": false,
+              "wall_s": 0.1368129999609664,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 67,
+          "total_timed": 63,
+          "search_wall_s": 0.5668445830233395,
+          "final_us": 7.375027053058147,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.UNROLL, axis=0, arg=4)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 9,
+              "compiled": 9,
+              "timed": 8,
+              "best_us": 7.6249707490205765,
+              "improved": true,
+              "wall_s": 0.1760069169686176,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 14,
+              "compiled": 14,
+              "timed": 13,
+              "best_us": 7.6249707490205765,
+              "improved": false,
+              "wall_s": 0.09556987503310665,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 23,
+          "total_timed": 21,
+          "search_wall_s": 0.37834925000788644,
+          "final_us": 7.6249707490205765,
+          "final_opts": [
+            "Opt(op=OptOps.GROUPTOP, axis=0, arg=32)"
+          ]
+        }
+      ]
+    },
+    "relu_4096": {
+      "heur_ms": 1.3982919917907566,
+      "heur_kernels": 1,
+      "beam_ms": 0.991770502878353,
+      "beam_vs_heur": 0.7092728190542077,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.1249669417738914,
+              "improved": true,
+              "wall_s": 0.14291058399248868,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.1249669417738914,
+              "improved": false,
+              "wall_s": 0.03643495897995308,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2445823749876581,
+          "final_us": 7.1249669417738914,
+          "final_opts": [
+            "Opt(op=OptOps.UPCAST, axis=0, arg=0)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 1356.3334941864014,
+              "improved": true,
+              "wall_s": 0.24549083301099017,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 976.1249530129135,
+              "improved": true,
+              "wall_s": 0.27325954200932756,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 16,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 976.1249530129135,
+              "improved": false,
+              "wall_s": 0.22087120899232104,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 42,
+          "total_timed": 39,
+          "search_wall_s": 0.8685680000344291,
+          "final_us": 976.1249530129135,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 939.0003979206085,
+              "improved": true,
+              "wall_s": 0.16229641699464992,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 19,
+              "timed": 19,
+              "best_us": 190.0000497698784,
+              "improved": true,
+              "wall_s": 0.14722970902221277,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 18,
+              "compiled": 18,
+              "timed": 16,
+              "best_us": 182.9999964684248,
+              "improved": true,
+              "wall_s": 0.09590424998896196,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 20,
+              "compiled": 20,
+              "timed": 17,
+              "best_us": 182.9999964684248,
+              "improved": false,
+              "wall_s": 0.13375141698634252,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 4,
+          "total_candidates": 64,
+          "total_timed": 59,
+          "search_wall_s": 0.6486719159875065,
+          "final_us": 182.9999964684248,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)",
+            "Opt(op=OptOps.UPCAST, axis=0, arg=4)",
+            "Opt(op=OptOps.UPCAST, axis=1, arg=4)"
+          ]
+        }
+      ]
+    },
+    "exp_2048": {
+      "heur_ms": 1.0593960178084671,
+      "heur_kernels": 1,
+      "beam_ms": 1.134541496867314,
+      "beam_vs_heur": 1.0709323782567142,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.166701834648848,
+              "improved": true,
+              "wall_s": 0.14524245803477243,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.166701834648848,
+              "improved": false,
+              "wall_s": 0.03754804201889783,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2507787920185365,
+          "final_us": 7.166701834648848,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 344.25000194460154,
+              "improved": true,
+              "wall_s": 0.32116599997971207,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 253.45833273604512,
+              "improved": true,
+              "wall_s": 0.35676745796808973,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 16,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 253.45833273604512,
+              "improved": false,
+              "wall_s": 0.3349681249819696,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 42,
+          "total_timed": 39,
+          "search_wall_s": 1.145528832974378,
+          "final_us": 253.45833273604512,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 239.41672407090664,
+              "improved": true,
+              "wall_s": 0.15236799995182082,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 19,
+              "timed": 19,
+              "best_us": 98.12501957640052,
+              "improved": true,
+              "wall_s": 0.11255075002554804,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 17,
+              "compiled": 17,
+              "timed": 15,
+              "best_us": 42.16661909595132,
+              "improved": true,
+              "wall_s": 0.09352408297127113,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 18,
+              "compiled": 18,
+              "timed": 15,
+              "best_us": 42.16661909595132,
+              "improved": false,
+              "wall_s": 0.10476241598371416,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 4,
+          "total_candidates": 61,
+          "total_timed": 56,
+          "search_wall_s": 0.5789787079556845,
+          "final_us": 42.16661909595132,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)",
+            "Opt(op=OptOps.UPCAST, axis=0, arg=4)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=8)"
+          ]
+        }
+      ]
+    },
+    "sum_4096": {
+      "heur_ms": 1.8374584906268865,
+      "heur_kernels": 3,
+      "beam_ms": 1.4586040051653981,
+      "beam_vs_heur": 0.7938160304605115,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.291673682630062,
+              "improved": true,
+              "wall_s": 0.1523388340137899,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.291673682630062,
+              "improved": false,
+              "wall_s": 0.03774233296280727,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2567203330108896,
+          "final_us": 7.291673682630062,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 1357.000321149826,
+              "improved": true,
+              "wall_s": 0.21910375001607463,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 975.4999773576856,
+              "improved": true,
+              "wall_s": 0.2828876670100726,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 16,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 975.4999773576856,
+              "improved": false,
+              "wall_s": 0.2268659999826923,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 42,
+          "total_timed": 39,
+          "search_wall_s": 0.8605433750199154,
+          "final_us": 975.4999773576856,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 15,
+              "compiled": 15,
+              "timed": 15,
+              "best_us": 169.75001199170947,
+              "improved": true,
+              "wall_s": 0.2675413329852745,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 28,
+              "compiled": 28,
+              "timed": 24,
+              "best_us": 131.3749817200005,
+              "improved": true,
+              "wall_s": 0.18905616702977568,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 30,
+              "compiled": 30,
+              "timed": 27,
+              "best_us": 125.25002239271998,
+              "improved": true,
+              "wall_s": 0.23993245797464624,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 28,
+              "compiled": 28,
+              "timed": 25,
+              "best_us": 125.25002239271998,
+              "improved": false,
+              "wall_s": 0.24846891697961837,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 4,
+          "total_candidates": 101,
+          "total_timed": 91,
+          "search_wall_s": 1.06059395900229,
+          "final_us": 125.25002239271998,
+          "final_opts": [
+            "Opt(op=OptOps.GROUPTOP, axis=0, arg=64)",
+            "Opt(op=OptOps.UNROLL, axis=0, arg=4)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 13,
+              "compiled": 13,
+              "timed": 12,
+              "best_us": 7.541675586253405,
+              "improved": true,
+              "wall_s": 0.17171058297390118,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 30,
+              "compiled": 30,
+              "timed": 28,
+              "best_us": 7.458322215825319,
+              "improved": true,
+              "wall_s": 0.08555937500204891,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 33,
+              "compiled": 33,
+              "timed": 30,
+              "best_us": 7.458322215825319,
+              "improved": false,
+              "wall_s": 0.1945768750156276,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 76,
+          "total_timed": 70,
+          "search_wall_s": 0.5613465419737622,
+          "final_us": 7.458322215825319,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=8)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=8)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 9,
+              "compiled": 9,
+              "timed": 8,
+              "best_us": 8.166651241481304,
+              "improved": true,
+              "wall_s": 0.16628995799692348,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 16,
+              "compiled": 16,
+              "timed": 14,
+              "best_us": 8.000002708286047,
+              "improved": true,
+              "wall_s": 0.11218654195545241,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 6,
+              "compiled": 6,
+              "timed": 5,
+              "best_us": 8.000002708286047,
+              "improved": false,
+              "wall_s": 0.05139920802321285,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 31,
+          "total_timed": 27,
+          "search_wall_s": 0.4376816659932956,
+          "final_us": 8.000002708286047,
+          "final_opts": [
+            "Opt(op=OptOps.GROUP, axis=0, arg=16)",
+            "Opt(op=OptOps.UNROLL, axis=1, arg=0)"
+          ]
+        }
+      ]
+    },
+    "permute": {
+      "heur_ms": 1.0235204827040434,
+      "heur_kernels": 1,
+      "beam_ms": 0.997187482425943,
+      "beam_vs_heur": 0.9742721316054848,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.249996997416019,
+              "improved": true,
+              "wall_s": 0.13898262497968972,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.249996997416019,
+              "improved": false,
+              "wall_s": 0.03890616702847183,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.24547695904038846,
+          "final_us": 7.249996997416019,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 75.4999928176403,
+              "improved": true,
+              "wall_s": 0.22539691597921774,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 70.99995855242014,
+              "improved": true,
+              "wall_s": 0.2824496250250377,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 16,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 70.99995855242014,
+              "improved": false,
+              "wall_s": 0.2282740410300903,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 42,
+          "total_timed": 39,
+          "search_wall_s": 0.8735977920005098,
+          "final_us": 70.99995855242014,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 14,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 37.24999260157347,
+              "improved": true,
+              "wall_s": 0.24062812502961606,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 33,
+              "compiled": 33,
+              "timed": 33,
+              "best_us": 23.833359591662884,
+              "improved": true,
+              "wall_s": 0.1360112910042517,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 27,
+              "compiled": 27,
+              "timed": 27,
+              "best_us": 7.6249707490205765,
+              "improved": true,
+              "wall_s": 0.07267537497682497,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 33,
+              "compiled": 33,
+              "timed": 33,
+              "best_us": 7.6249707490205765,
+              "improved": false,
+              "wall_s": 0.23828145797597244,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 4,
+          "total_candidates": 107,
+          "total_timed": 107,
+          "search_wall_s": 0.7973532910109498,
+          "final_us": 7.6249707490205765,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=1, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.UPCAST, axis=2, arg=0)"
+          ]
+        }
+      ]
+    },
+    "softmax": {
+      "heur_ms": 1.4147289912216365,
+      "heur_kernels": 3,
+      "beam_ms": 1.4867915015202016,
+      "beam_vs_heur": 1.0509373249192682,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.249996997416019,
+              "improved": true,
+              "wall_s": 0.1568772079772316,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.249996997416019,
+              "improved": false,
+              "wall_s": 0.0363090829923749,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.25864520901814103,
+          "final_us": 7.249996997416019,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 15.125027857720852,
+              "improved": true,
+              "wall_s": 0.2398878749809228,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 13.999990187585354,
+              "improved": true,
+              "wall_s": 0.27342216699616984,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 18,
+              "compiled": 18,
+              "timed": 17,
+              "best_us": 13.999990187585354,
+              "improved": false,
+              "wall_s": 0.14026879199082032,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 44,
+          "total_timed": 42,
+          "search_wall_s": 0.7857455830089748,
+          "final_us": 13.999990187585354,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=4)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 15,
+              "compiled": 15,
+              "timed": 15,
+              "best_us": 10.66667027771473,
+              "improved": true,
+              "wall_s": 0.2665297500207089,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 28,
+              "compiled": 28,
+              "timed": 26,
+              "best_us": 10.624993592500687,
+              "improved": true,
+              "wall_s": 0.15697812498547137,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 28,
+              "compiled": 28,
+              "timed": 24,
+              "best_us": 10.374991688877344,
+              "improved": true,
+              "wall_s": 0.1844958330038935,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 22,
+              "compiled": 22,
+              "timed": 19,
+              "best_us": 10.124989785254002,
+              "improved": true,
+              "wall_s": 0.1819958330015652,
+              "exiting": false
+            },
+            {
+              "round": 4,
+              "candidates": 18,
+              "compiled": 18,
+              "timed": 16,
+              "best_us": 10.124989785254002,
+              "improved": false,
+              "wall_s": 0.16757887497078627,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 5,
+          "total_candidates": 111,
+          "total_timed": 100,
+          "search_wall_s": 1.0812147500109859,
+          "final_us": 10.124989785254002,
+          "final_opts": [
+            "Opt(op=OptOps.GROUPTOP, axis=0, arg=64)",
+            "Opt(op=OptOps.UNROLL, axis=0, arg=4)",
+            "Opt(op=OptOps.UNROLL, axis=1, arg=4)",
+            "Opt(op=OptOps.GROUP, axis=0, arg=4)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 15,
+              "compiled": 15,
+              "timed": 15,
+              "best_us": 11.999974958598614,
+              "improved": true,
+              "wall_s": 0.24211095803184435,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 21,
+              "compiled": 21,
+              "timed": 21,
+              "best_us": 11.416675988584757,
+              "improved": true,
+              "wall_s": 0.18692408403148875,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 22,
+              "compiled": 22,
+              "timed": 20,
+              "best_us": 11.416675988584757,
+              "improved": false,
+              "wall_s": 0.17718129098648205,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 58,
+          "total_timed": 56,
+          "search_wall_s": 0.7194027090445161,
+          "final_us": 11.416675988584757,
+          "final_opts": [
+            "Opt(op=OptOps.GROUPTOP, axis=0, arg=256)",
+            "Opt(op=OptOps.UNROLL, axis=0, arg=4)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 14,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 7.04167177900672,
+              "improved": true,
+              "wall_s": 0.21547191601712257,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 21,
+              "compiled": 21,
+              "timed": 21,
+              "best_us": 7.04167177900672,
+              "improved": false,
+              "wall_s": 0.11775808298261836,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 35,
+          "total_timed": 35,
+          "search_wall_s": 0.4410635420354083,
+          "final_us": 7.04167177900672,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        }
+      ]
+    },
+    "layernorm": {
+      "heur_ms": 2.065583015792072,
+      "heur_kernels": 3,
+      "beam_ms": 1.6103750094771385,
+      "beam_vs_heur": 0.7796225071397682,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.249996997416019,
+              "improved": true,
+              "wall_s": 0.14934270799858496,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.249996997416019,
+              "improved": false,
+              "wall_s": 0.03764945897273719,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2528592079761438,
+          "final_us": 7.249996997416019,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 341.16662573069334,
+              "improved": true,
+              "wall_s": 0.23376195802120492,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 253.6250394769013,
+              "improved": true,
+              "wall_s": 0.28661370801273733,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 16,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 253.6250394769013,
+              "improved": false,
+              "wall_s": 0.23564124997938052,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 42,
+          "total_timed": 39,
+          "search_wall_s": 0.8851142500061542,
+          "final_us": 253.6250394769013,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 16,
+              "compiled": 16,
+              "timed": 15,
+              "best_us": 62.50001024454832,
+              "improved": true,
+              "wall_s": 0.25228491600137204,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 34,
+              "compiled": 34,
+              "timed": 31,
+              "best_us": 61.45832594484091,
+              "improved": true,
+              "wall_s": 0.1838571249973029,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 30,
+              "compiled": 30,
+              "timed": 27,
+              "best_us": 33.41666888445616,
+              "improved": true,
+              "wall_s": 0.20773362496402115,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 21,
+              "compiled": 21,
+              "timed": 20,
+              "best_us": 33.41666888445616,
+              "improved": false,
+              "wall_s": 0.2033479589736089,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 4,
+          "total_candidates": 101,
+          "total_timed": 93,
+          "search_wall_s": 0.9652933750185184,
+          "final_us": 33.41666888445616,
+          "final_opts": [
+            "Opt(op=OptOps.GROUPTOP, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=4)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 16,
+              "compiled": 16,
+              "timed": 16,
+              "best_us": 18.250022549182177,
+              "improved": true,
+              "wall_s": 0.3178386249928735,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 34,
+              "compiled": 34,
+              "timed": 32,
+              "best_us": 18.250022549182177,
+              "improved": false,
+              "wall_s": 0.26511512498836964,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 50,
+          "total_timed": 48,
+          "search_wall_s": 0.6929524579900317,
+          "final_us": 18.250022549182177,
+          "final_opts": [
+            "Opt(op=OptOps.GROUPTOP, axis=0, arg=16)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 14,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 232.1666106581688,
+              "improved": true,
+              "wall_s": 0.2376139159896411,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 33,
+              "compiled": 33,
+              "timed": 33,
+              "best_us": 37.54167119041085,
+              "improved": true,
+              "wall_s": 0.20079199998872355,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 26,
+              "compiled": 26,
+              "timed": 26,
+              "best_us": 37.54167119041085,
+              "improved": false,
+              "wall_s": 0.1342585840029642,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 73,
+          "total_timed": 73,
+          "search_wall_s": 0.6805145419784822,
+          "final_us": 37.54167119041085,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)",
+            "Opt(op=OptOps.LOCAL, axis=1, arg=16)"
+          ]
+        }
+      ]
+    },
+    "matvec": {
+      "heur_ms": 1.8663954979274422,
+      "heur_kernels": 1,
+      "beam_ms": 1.4120000123512,
+      "beam_vs_heur": 0.7565384796090484,
+      "search": [
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.541675586253405,
+              "improved": true,
+              "wall_s": 0.146423332975246,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.541675586253405,
+              "improved": false,
+              "wall_s": 0.0385146249900572,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2581093329936266,
+          "final_us": 7.541675586253405,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.166701834648848,
+              "improved": true,
+              "wall_s": 0.14655424997908995,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.166701834648848,
+              "improved": false,
+              "wall_s": 0.03875637496821582,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.2537328340113163,
+          "final_us": 7.166701834648848,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=2)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 11.750031262636185,
+              "improved": true,
+              "wall_s": 0.331582666025497,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 11.750031262636185,
+              "improved": false,
+              "wall_s": 0.37571787502383813,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 26,
+          "total_timed": 25,
+          "search_wall_s": 0.8416258340002969,
+          "final_us": 11.750031262636185,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 2,
+              "compiled": 2,
+              "timed": 2,
+              "best_us": 7.499998901039362,
+              "improved": true,
+              "wall_s": 0.1606065410305746,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 1,
+              "compiled": 1,
+              "timed": 0,
+              "best_us": 7.499998901039362,
+              "improved": false,
+              "wall_s": 0.03286858298815787,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 2,
+          "total_candidates": 3,
+          "total_timed": 2,
+          "search_wall_s": 0.26550487498752773,
+          "final_us": 7.499998901039362,
+          "final_opts": [
+            "Opt(op=OptOps.UPCAST, axis=0, arg=0)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 7,
+              "compiled": 7,
+              "timed": 7,
+              "best_us": 1356.6664420068264,
+              "improved": true,
+              "wall_s": 0.2333163340226747,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 19,
+              "compiled": 18,
+              "timed": 18,
+              "best_us": 975.4166821949184,
+              "improved": true,
+              "wall_s": 0.29468066699337214,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 16,
+              "compiled": 14,
+              "timed": 14,
+              "best_us": 740.8750243484974,
+              "improved": true,
+              "wall_s": 0.23671895801089704,
+              "exiting": false
+            },
+            {
+              "round": 3,
+              "candidates": 20,
+              "compiled": 12,
+              "timed": 12,
+              "best_us": 740.8750243484974,
+              "improved": false,
+              "wall_s": 1.118942250031978,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 4,
+          "total_candidates": 62,
+          "total_timed": 51,
+          "search_wall_s": 2.06138629099587,
+          "final_us": 740.8750243484974,
+          "final_opts": [
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=32)",
+            "Opt(op=OptOps.UPCAST, axis=1, arg=4)"
+          ]
+        },
+        {
+          "rounds": [
+            {
+              "round": 0,
+              "candidates": 15,
+              "compiled": 15,
+              "timed": 15,
+              "best_us": 360.4167141020298,
+              "improved": true,
+              "wall_s": 0.2919230419793166,
+              "exiting": false
+            },
+            {
+              "round": 1,
+              "candidates": 32,
+              "compiled": 32,
+              "timed": 30,
+              "best_us": 124.12498472258449,
+              "improved": true,
+              "wall_s": 0.30612841702532023,
+              "exiting": false
+            },
+            {
+              "round": 2,
+              "candidates": 19,
+              "compiled": 19,
+              "timed": 19,
+              "best_us": 124.12498472258449,
+              "improved": false,
+              "wall_s": 0.1770048339967616,
+              "exiting": true
+            }
+          ],
+          "n_rounds": 3,
+          "total_candidates": 66,
+          "total_timed": 64,
+          "search_wall_s": 0.8897615000023507,
+          "final_us": 124.12498472258449,
+          "final_opts": [
+            "Opt(op=OptOps.GROUP, axis=0, arg=16)",
+            "Opt(op=OptOps.LOCAL, axis=0, arg=16)"
+          ]
+        }
+      ]
+    }
+  }
+}
