@@ -486,9 +486,9 @@ Fails on: AMD gfx1201 (both amd and amdllvm backends).
 
 ### H0.6a: gfx1201 has half the elements_per_thread of gfx1100
 
-**Status:** CONFIRMED — root cause identified
+**Status:** REFRAMED — register pressure theory was incomplete
 
-**Evidence:**
+**Evidence (original):**
 ```
 gfx1100 (RDNA3): elements_per_thread = (16, 16, 8)  — passes
 gfx1201 (RDNA4): elements_per_thread = (8, 8, 8)    — fails
@@ -496,12 +496,19 @@ gfx950  (CDNA3): elements_per_thread = (32, 32, 4)  — passes
 Metal:           elements_per_thread = (2, 2, 2)     — passes
 ```
 
-gfx1201 has half the M/N elements per thread (8 vs 16). UNROLL(0, 4) quadruples WMMA calls per thread. With 8 elements × 4 unroll = 32 live values per thread, the register file is saturated and the AMD compiler generates incorrect WMMA output — results alias with live inputs.
+Original theory: gfx1201 has half the M/N elements per thread (8 vs 16). UNROLL(0, 4) quadruples WMMA calls per thread. With 8 elements × 4 unroll = 32 live values per thread, the register file is saturated and the AMD compiler generates incorrect WMMA output — results alias with live inputs.
 
-Metal passes because its elements_per_thread is only (2,2,2) — 2 × 4 = 8 live values, well within register budget.
+**Evidence (2026-05-08, PR #16107 CI):** UPCAST(1,2) *alone* — without any UNROLL — also produces incorrect WMMA on gfx1201. `test_gemm_fp16` fails with `inf` values in the first columns of a 64×64 matmul. The UNROLL skip (`if not arch.startswith("gfx12")`) was present and working; the failure came purely from changing the UPCAST axis from the original M+N pattern to N-only.
 
-**Trajectory:** DIVERGENT for. The root cause is quantitative (register pressure from elements_per_thread × unroll_factor), not qualitative (broken WMMA). The fix is to cap the unroll factor based on elements_per_thread.
+This kills the register-pressure-from-UNROLL theory. The root cause is deeper: gfx1201's WMMA is sensitive to the specific post-TC UPCAST axis configuration. The old heuristic (UPCAST M+N with [5,4,3,2] + LOCAL N) produces a WMMA-safe memory layout on RDNA4. Changing to UPCAST N-only (axis 1, factor 2) changes the data layout in a way that misaligns WMMA tile boundaries.
 
-**Resolution:** PR #16107 falls back to the original post-TC heuristic on gfx12 entirely (UPCAST M+N, LOCAL N — the pre-fix behavior). The new UPCAST+UNROLL strategy only applies to non-gfx12 platforms. CI passes on all backends including gfx1201.
+**Open questions:**
+- Is the issue the axis (1 vs both 0+1), the factor (2 vs [5,4,3,2]), or the absence of LOCAL?
+- Does gfx1100 (RDNA3) tolerate UPCAST(1,2) because its larger elements_per_thread provides more layout flexibility?
+- Would UPCAST(0,2) + UPCAST(1,2) (both axes, smaller factors) be safe on gfx12?
+
+**Trajectory:** OSCILLATORY. The register pressure theory was a plausible but incomplete explanation. The real constraint on gfx12 is WMMA tile layout sensitivity — a deeper investigation into RDNA4's WMMA operand layout rules is needed, ideally with AMD ISA documentation.
+
+**Resolution:** PR #16107 now falls back to the *entire* original post-TC heuristic on gfx12 (UPCAST M+N + LOCAL N — verbatim pre-fix behavior). The new UPCAST N + UNROLL K strategy only applies to non-gfx12 platforms.
 
 The gfx12-specific investigation (safe UNROLL factor, WMMA tile constraints) remains open but is not blocking — the PR ships with the conservative fallback.
