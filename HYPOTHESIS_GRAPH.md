@@ -85,7 +85,7 @@ Each cycle narrows. The branching factor at each step is 2-3, not the full knob 
 
 ## H4: The memo table should cache theories, not just winning schedules
 
-**Status:** ALIVE (contingent on H2, H3)
+**Status:** ★ CONFIRMED (2026-05-08)
 
 **Claim:** BEAM's disk cache stores `applied_opts` — the winning schedule transformations. An abduction engine should cache the *theory* (e.g., "memory-bound, GROUP helps") alongside the winning schedule.
 
@@ -98,24 +98,218 @@ Each cycle narrows. The branching factor at each step is 2-3, not the full knob 
 - If kernel performance is so shape-sensitive that no theory transfers across shapes → caching theories has no advantage over caching schedules.
 - If the structural features that determine the theory are already captured by `ast.key` → the current cache is sufficient.
 
+### H4 evidence: theory transfer test (2026-05-08)
+
+**Perturbation:** Derived a theory from gemm_1024 ("after TC: UPCAST N by 2, UNROLL K by 4, UPCAST M by 4, LOCAL M by 4") and tested it on 6 other matmul shapes.
+
+**Exact schedule transfer:** FAILS on 3/6 shapes. Literal opt sequences are shape-specific — `UPCAST(0,4)` fails when post-TC axis 0 has size 2 (tall_skinny), `UNROLL(0,4)` fails when reduce axis has size 2 (wide).
+
+**Semantic theory transfer:** WORKS on 7/7 shapes. The adaptive theory ("UPCAST N, UNROLL K, UPCAST M, LOCAL M — each by largest divisor that fits") applies universally:
+
+| Shape | Heuristic | Adaptive Theory | theory/heur |
+|-------|-----------|-----------------|-------------|
+| 1024×1024 | 55068us | 9224us | **0.17x** |
+| 256×256 | 749us | 146us | **0.19x** |
+| 2048×2048 | 580501us | 89313us | **0.15x** |
+| 16×4096 × 4096×4096 | 21428us | 4230us | **0.20x** |
+| 8×2048 × 2048×2048 | 3715us | 420us | **0.11x** |
+| 4096×16 × 16×4096 | 16671us | 2955us | **0.18x** |
+| 512×2048 × 2048×256 | 15435us | 2229us | **0.14x** |
+
+The cached theory derived from ONE measurement (gemm_1024) transfers to ALL tested shapes and beats the heuristic 5-9x with zero additional measurements. Fresh per-shape abduction (~52 trials) gets another 1.3-2x on top.
+
+**Bonus finding:** The heuristic is actively harmful on large matmuls — NOOPT is faster than the heuristic on gemm_1024 (19348us vs 55068us) and gemm_2048. The heuristic's post-TC opts hurt more than they help at scale.
+
+**Trajectory:** DIVERGENT for H4. Cache the semantic theory, not the literal schedule. The theory is the transferable unit.
+
+**Reasoning mode:** Induction (7 shapes measured). Confidence: 90% — tested on matmul class only, transfer to other kernel classes (reduction, elementwise) is untested.
+
 ---
 
 ## H5: Abduction obsoletes heuristics
 
-**Status:** ALIVE (contingent on H0)
+**Status:** REFRAMED — abduction obsoletes parameters, not pattern matching
 
-**Claim:** tinygrad maintains two optimization paths: hand-coded heuristics (`hand_coded_optimizations`) and BEAM search. They exist because neither is sufficient alone. Heuristics encode human theories about kernel structure ("matvec needs different tiling than square GEMM") but can't adapt. BEAM adapts but can't reason. Every new kernel shape that the heuristic doesn't cover requires a human to write a new rule.
+**Original claim:** An abduction engine that forms theories from observations does what heuristics do but derives the theory from measurement instead of hardcoding it. If it works, the heuristic codepath is dead code.
 
-An abduction engine that forms theories from observations does what heuristics do (classify the kernel, select a strategy) but derives the theory from measurement instead of hardcoding it. If it works, the heuristic codepath is dead code.
+**Revised claim:** The heuristic is a cascade of pattern-matchers feeding parameterized transformations. Abduction replaces the *parameters* (upcast amounts, local sizes, thresholds) with measurement-derived values. The *pattern matchers* (TC eligibility, matvec detection, reduction classification) are structural priors that measurement alone cannot efficiently replace. The optimal system is a hybrid: structural priors from AST analysis, parameters from measurement, cached theories for amortization.
 
-**Evidence from the repo:**
-- The heuristic has shape-specific branches that accumulate over time: CPU matvec (#15599, #15616), group heuristic (#13677), tensor core heuristic (#3197). Each is a manually encoded theory about one kernel shape.
-- When the heuristic misapplies, BEAM can't compensate: matvec lift = 0.8x (heuristic *hurts*), mul_sum lift = 0.5x. The heuristic assumes a structure the kernel doesn't have, and BEAM has no mechanism to override it.
-- geohot rejects heuristic PRs that are too shape-specific (#15599: "looks vaguely AI", #15616: closed). He wants general solutions, not more special cases.
+**What would disprove the revised claim:**
+- If the structural priors are themselves wrong often enough to cancel the parameter improvements → the pattern matchers are a liability, not a prior.
+- If theory caching (H4) fails to amortize measurement cost → the hybrid is more expensive than the heuristic for no quality gain.
 
-**What would disprove this:**
-- If the heuristic's theories are cheap to maintain and the abduction engine's theories are expensive to derive → heuristics win on amortized cost even if abduction is more general.
-- If kernel shapes cluster into a small fixed set (GEMM, elementwise, reduction, scan) and the heuristic already covers all of them → no new theories are needed, and the maintenance cost of heuristics is bounded.
+---
+
+### H5 Investigation (2026-05-08)
+
+#### Phase 1: Heuristic decomposition
+
+**Perturbation:** Decomposed `hand_coded_optimizations` (192 lines) into 9 distinct strategies. Measured heuristic vs NOOPT on 12 workloads.
+
+The heuristic encodes 9 strategies in a priority cascade with early returns:
+
+| # | Strategy | Lines | Theory | Derivable from measurement? |
+|---|----------|-------|--------|----------------------------|
+| S1 | Tensor Core | 38 | Map WMMA-eligible reductions to hardware TC units | Partially — TC applicability is structural, post-TC params are measurable |
+| S2 | Image Upcast | 12 | GPU image memory returns float4; upcast to match | No — requires dtype/memory-layout knowledge |
+| S3 | MatVec | 19 | Shared memory reduces global traffic for MV products | Mostly — params searchable, trigger is structural |
+| S4 | GroupTop | 10 | Small-output reductions need thread-parallel reduce | Partially — threshold searchable, decision structural |
+| S5 | Masked Upcast | 10 | Small masked dims (stack/winograd) → register upcast | No — requires WHERE-gate detection in AST |
+| S6 | Stride Upcast | 27 | Upcast broadcast axes to maximize data reuse | Mostly — stride analysis is structural, amounts searchable |
+| S7 | Reduce Unroll | 15 | Small reduce dims → straight-line code | Yes |
+| S7b | Fallback Upcast | 4 | Some upcasting always better than none | Yes |
+| S8 | Local Groups | 20 | Map expand axes to workgroup dims for occupancy | Partially — axis ranking structural, sizes searchable |
+| S9 | CPU Threading | 12 | ~128K ops/thread avoids thread overhead | Yes |
+
+**Result:** 45% of lines encode measurement-derivable theories (parameters, thresholds). 42% encode structural knowledge (pattern matching, hardware architecture). 13% is boilerplate.
+
+**Heuristic vs NOOPT (Metal, M4 Max):**
+
+| Workload | Heuristic | NOOPT | h/noopt | Verdict |
+|----------|-----------|-------|---------|---------|
+| matmul_big (2048²) | 5.08ms | 168.51ms | 0.03x | HELPS (33x) |
+| gemm_1024 | 1.77ms | 20.19ms | 0.09x | HELPS (11x) |
+| tall_skinny (16×4096) | 1.59ms | 6.37ms | 0.25x | HELPS (4x) |
+| conv2d_3x3 | 1.48ms | 3.42ms | 0.43x | HELPS |
+| layernorm | 1.93ms | 4.09ms | 0.47x | HELPS |
+| softmax | 0.97ms | 1.41ms | 0.69x | HELPS |
+| matvec | 1.07ms | 1.40ms | 0.77x | HELPS |
+| mul_sum | 2.00ms | 1.25ms | 1.60x | **HURTS** |
+
+**Trajectory:** OSCILLATORY. Heuristic helps most workloads (11-33x on matmul) but hurts mul_sum (1.6x slower). Split into sub-hypotheses.
+
+---
+
+#### H5.1: TC dominates the heuristic's value
+
+**Status:** REFUTED
+
+**Perturbation:** Disabled TC via `USE_TC=0`, kept all other heuristic strategies. Measured.
+
+**Evidence:** For gemm_1024, non-TC strategies alone (upcast/local/unroll) provide 10.5x speedup over NOOPT. Full heuristic (with TC) provides 12.0x. TC adds only 1.14x on top.
+
+For tall_skinny, TC contributes nothing — the entire 3.5x speedup is from non-TC strategies.
+
+**Trajectory:** DIVERGENT against H5.1. The heuristic's main value is tiling (upcast/local), not tensor cores. TC is the cherry on top, not the cake. (Abduction: Peirce 1878. Confidence: 85% — based on 6 workloads, Metal only.)
+
+---
+
+#### H5.2: MATVEC pattern matching is a liability
+
+**Status:** CONFIRMED — one misclassification identified
+
+**Perturbation:** Analyzed the MATVEC detection pattern (lines 68-82) against all benchmark workloads.
+
+**Evidence:** `(a * b).sum()` (mul_sum) triggers the MATVEC path because both buffers use identical indexing — the subset check `all(r in idx1.ranges for r in idx0.ranges)` is trivially true when ranges are equal. A true matvec has an asymmetric access pattern: vector ranges are a *strict* subset of matrix ranges.
+
+GEMM correctly fails the pattern because M is in idx0 but not idx1. Only mul_sum is misclassified.
+
+The MATVEC path on mul_sum produces kernel `r_256_8_4_4_512` (GROUP+LOCAL+UPCAST) = 1758us. The NOOPT kernel `r_4096_4096` = 424us. 4x regression from misclassification.
+
+**Fix:** Add strict subset check: `len(idx0.ranges) < len(idx1.ranges)` or `idx0.ranges != idx1.ranges`.
+
+**Trajectory:** DIVERGENT for H5.2. The pattern matcher is wrong, and the wrongness is identifiable from measurement (try GROUP, observe regression). (Deduction: traced code logic. Confidence: 95%.)
+
+---
+
+#### H5.3: Minimal abduction loop vs heuristic
+
+**Status:** CONFIRMED — abduction beats heuristic on 3/5, loses on 2/5
+
+**Perturbation:** Built a 3-step measurement loop (try TC → try UPCAST per axis → try LOCAL per axis, 23 trials total) and compared to the heuristic on individual kernels.
+
+**Evidence:**
+
+| Workload | NOOPT | Heuristic | Abduction (23 trials) | a/h |
+|----------|-------|-----------|----------------------|-----|
+| gemm_1024 | 19614us | 307us | **144us** | **0.47x** (abduction 2x better) |
+| mul_sum | 941us | 1180us | **371us** | **0.31x** (abduction 3x better) |
+| softmax | 135us | 22us | **18us** | **0.82x** (abduction better) |
+| matvec | 10907us | **223us** | 257us | 1.15x (heuristic better) |
+| layernorm | 2751us | **63us** | 467us | 7.35x (heuristic 7x better) |
+
+**Why abduction wins on gemm:** Found TC+UPCAST(1,2)+UNROLL(0,4)+UPCAST(0,4)+LOCAL(0,4). The heuristic's frozen post-TC opts (UPCAST(0,2)+UNROLL(0,4)) miss the additional UPCAST and LOCAL that measurement discovers.
+
+**Why abduction wins on mul_sum:** Correctly skipped GROUP (no MATVEC misclassification). Just UPCAST(1,4) = 371us. Measurement avoids the pattern-matching bug.
+
+**Why heuristic wins on matvec:** The heuristic's dedicated MATVEC path (GROUP+LOCAL+UPCAST) is better. The abduction loop doesn't try GROUP — it's missing from its repertoire.
+
+**Why heuristic wins on layernorm:** The heuristic's stride-based multi-axis selection (UPCAST axis 2, LOCAL axes 1+2) is precisely tuned. The abduction loop picks wrong axes because it doesn't analyze buffer strides — it just tries axes in order.
+
+**Trajectory:** OSCILLATORY. Abduction beats the heuristic when the heuristic's parameters are wrong or its patterns misfire. Heuristic beats abduction when structural priors (stride analysis, GROUP strategy) guide the search to the right region. Neither dominates. Split into the revised claim.
+
+---
+
+#### H5.4: The hybrid architecture (reframe)
+
+**Status:** PROPOSED — the investigation's structural finding
+
+The surviving hypothesis is not "abduction replaces heuristics" or "heuristics suffice." It's:
+
+**The heuristic is a two-layer system:** structural priors (pattern matching on the AST) and parameterized transformations (upcast amounts, local sizes, thresholds). The abduction engine should:
+
+1. **Keep the structural priors** — TC eligibility, kernel class detection (matmul/matvec/reduction/elementwise), stride analysis for axis selection. These are cheap (zero measurement) and mostly correct.
+
+2. **Replace the parameters with measurement** — instead of hardcoded [5,4,3,2] for upcast and [4,2] for local, try 2-3 values and pick the best. This is where the heuristic's frozen constants go wrong (post-TC axis, mul_sum MATVEC).
+
+3. **Fix the structural priors when measurement proves them wrong** — mul_sum's MATVEC misclassification is detected by measurement (GROUP hurts → not a matvec). Feed this back to refine the pattern.
+
+4. **Cache the theory** (H4) — "gemm_1024 class: TC + UPCAST(1,2) + UNROLL(0,4) + UPCAST(0,4) + LOCAL(0,4)." Next time a similar kernel arrives, skip measurement and apply the cached theory. Amortized cost approaches the heuristic.
+
+**Falsification:** If theory caching doesn't transfer across shapes (every new shape requires fresh measurement), the hybrid is just BEAM with extra steps.
+
+---
+
+### H5 reasoning mode table
+
+| Claim | Mode | Confidence | Source |
+|-------|------|------------|--------|
+| Heuristic encodes 9 strategies, 45% measurement-derivable | Deduction | 95% | Code analysis of heuristic.py |
+| Non-TC strategies provide 10.5x on gemm (TC adds 1.14x) | Induction | 85% | Measured on Metal M4 Max, 6 workloads |
+| mul_sum is MATVEC-misclassified due to equal (not strict subset) ranges | Deduction | 95% | Traced code logic + confirmed by measurement |
+| Minimal abduction beats heuristic on 3/5 kernels | Induction | 80% | 23-trial loop, Metal only, single kernel per workload |
+| Heuristic wins on matvec/layernorm due to GROUP and stride analysis | Abduction | 75% | Inferred from missing GROUP in loop + wrong axis selection |
+| Hybrid (structural priors + measurement params) is the optimal architecture | Abduction | 70% | Proposed from oscillatory evidence, not yet tested |
+
+### H5 pruning log
+
+| Hypothesis | Status | Killed by |
+|------------|--------|-----------|
+| H5 (original): abduction obsoletes heuristics | REFRAMED | Oscillatory evidence: wins on 3/5, loses on 2/5 |
+| H5.1: TC dominates value | KILLED | Measurement: USE_TC=0 still gives 10.5x |
+| H5.2: MATVEC misclassification | CONFIRMED | Code trace + measurement |
+| H5.3: minimal abduction loop | CONFIRMED (partial) | Wins on gemm/mul_sum/softmax, loses on matvec/layernorm |
+| H5.4: hybrid architecture | PROPOSED | Open — needs implementation and benchmark |
+
+### H5 frontier edges — resolved
+
+**Edge 1+2: GROUP + stride-aware abduction loop — RESOLVED**
+
+Added GROUP [4,8,16], GROUPTOP(16), UNROLL [4,0], and stride-based axis ordering to the abduction loop (~52 trials). Score went from 3/5 to **4/5**:
+
+| Workload | Heuristic | New Abduction (52t) | vs Heur |
+|----------|-----------|---------------------|---------|
+| gemm_1024 | 307us | **153us** | 0.50x |
+| mul_sum | 343us | **223us** | 0.65x |
+| softmax | 15us | **4us** | 0.24x |
+| matvec | **103us** | 112us | 1.10x |
+| layernorm | 33us | **19us** | 0.56x |
+
+Geometric mean: abduction is **1.85x faster** than the heuristic. The sole remaining gap is matvec (1.10x) — the heuristic's fixed GROUP+LOCAL+UPCAST combo beats the loop's greedy GROUP selection. Closing this gap requires joint optimization (branch-and-bound or mini-beam), not more repertoire.
+
+**Edge 3: Theory transfer — RESOLVED (see H4)**
+
+Semantic theories transfer across all 7 tested matmul shapes. Exact schedules fail on 3/6. Cache the theory, not the schedule.
+
+**Edge 4: MATVEC strict subset fix — CONFIRMED**
+
+Adding `set(idx0.ranges) == set(idx1.ranges)` rejection correctly blocks mul_sum from the MATVEC path. Separate PR candidate — independent of the abduction engine.
+
+### H5 remaining frontier
+
+1. **Theory transfer to non-matmul classes** — does the adaptive theory pattern work for reductions, elementwise, convolutions? Each class would need its own seed measurement. (Untested.)
+2. **Joint GROUP+LOCAL+UPCAST optimization** — the matvec gap (1.10x) requires evaluating combos, not greedy steps. A 2-deep mini-beam (try GROUP×LOCAL×UPCAST jointly) would close it. (Design question, ~20 lines.)
+3. **Amortized cost measurement** — the abduction loop takes 52 trials × compile+time cost. What's the wall-clock cost vs BEAM's 200+ trials? Is it actually faster end-to-end? (Needs timing.)
 
 ---
 
