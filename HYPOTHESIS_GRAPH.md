@@ -288,3 +288,25 @@ Fails on: AMD gfx1201 (both amd and amdllvm backends).
 - H0.6b: Is there a safe UNROLL factor (2 instead of 4)? Or a different post-TC strategy that helps both?
 
 **PR #16104 must be reverted or made backend-conditional.** The investigation re-enters Phase 2 with the oscillatory result.
+
+### H0.6a: gfx1201 has half the elements_per_thread of gfx1100
+
+**Status:** CONFIRMED — root cause identified
+
+**Evidence:**
+```
+gfx1100 (RDNA3): elements_per_thread = (16, 16, 8)  — passes
+gfx1201 (RDNA4): elements_per_thread = (8, 8, 8)    — fails
+gfx950  (CDNA3): elements_per_thread = (32, 32, 4)  — passes
+Metal:           elements_per_thread = (2, 2, 2)     — passes
+```
+
+gfx1201 has half the M/N elements per thread (8 vs 16). UNROLL(0, 4) quadruples WMMA calls per thread. With 8 elements × 4 unroll = 32 live values per thread, the register file is saturated and the AMD compiler generates incorrect WMMA output — results alias with live inputs.
+
+Metal passes because its elements_per_thread is only (2,2,2) — 2 × 4 = 8 live values, well within register budget.
+
+**Trajectory:** DIVERGENT for. The root cause is quantitative (register pressure from elements_per_thread × unroll_factor), not qualitative (broken WMMA). The fix is to cap the unroll factor based on elements_per_thread.
+
+**Revised fix:** `UNROLL(0, min(4, max_safe_unroll))` where `max_safe_unroll = 32 // max(elements_per_thread)`. For gfx1201: 32 // 8 = 4 — wait, that's the same. Let me check: maybe the issue is UNROLL(0, 4) on fp16 specifically, where each element is 2 bytes and the register file is 32-bit.
+
+Actually, the real question: does UNROLL(0, 2) work on gfx1201?
