@@ -484,11 +484,11 @@ Fails on: AMD gfx1201 (both amd and amdllvm backends).
 
 **PR #16104 must be reverted or made backend-conditional.** The investigation re-enters Phase 2 with the oscillatory result.
 
-### H0.6a: gfx1201 has half the elements_per_thread of gfx1100
+### H0.6a: RDNA4 WMMA operand lane mapping is incompatible with N-only UPCAST
 
-**Status:** REFRAMED — register pressure theory was incomplete
+**Status:** ★ ROOT CAUSE IDENTIFIED — WMMA swizzle + opts ordering, not register pressure
 
-**Evidence (original):**
+**Evidence (original, killed):**
 ```
 gfx1100 (RDNA3): elements_per_thread = (16, 16, 8)  — passes
 gfx1201 (RDNA4): elements_per_thread = (8, 8, 8)    — fails
@@ -496,19 +496,35 @@ gfx950  (CDNA3): elements_per_thread = (32, 32, 4)  — passes
 Metal:           elements_per_thread = (2, 2, 2)     — passes
 ```
 
-Original theory: gfx1201 has half the M/N elements per thread (8 vs 16). UNROLL(0, 4) quadruples WMMA calls per thread. With 8 elements × 4 unroll = 32 live values per thread, the register file is saturated and the AMD compiler generates incorrect WMMA output — results alias with live inputs.
+Original theory (KILLED): register pressure from elements_per_thread × unroll_factor. Disproved by PR #16107 CI: UPCAST(1,2) alone — no UNROLL — also produces incorrect WMMA on gfx1201.
 
-**Evidence (2026-05-08, PR #16107 CI):** UPCAST(1,2) *alone* — without any UNROLL — also produces incorrect WMMA on gfx1201. `test_gemm_fp16` fails with `inf` values in the first columns of a 64×64 matmul. The UNROLL skip (`if not arch.startswith("gfx12")`) was present and working; the failure came purely from changing the UPCAST axis from the original M+N pattern to N-only.
+**Evidence (2026-05-08, code analysis):** Three structural differences between RDNA3 and RDNA4 TensorCore definitions in `tc.py`:
 
-This kills the register-pressure-from-UNROLL theory. The root cause is deeper: gfx1201's WMMA is sensitive to the specific post-TC UPCAST axis configuration. The old heuristic (UPCAST M+N with [5,4,3,2] + LOCAL N) produces a WMMA-safe memory layout on RDNA4. Changing to UPCAST N-only (axis 1, factor 2) changes the data layout in a way that misaligns WMMA tile boundaries.
+1. **opts ordering** — RDNA3: `('l0','l0','l0','l0','l1','u1','u1','u1')`, RDNA4: `('l0','l0','l0','l0','u1','u1','u1','l1')`. RDNA4 places the `l1` local split AFTER the axis-1 upcasts. This changes the order in which axes are carved during TC setup (`postrange.py:265-276`).
 
-**Open questions:**
-- Is the issue the axis (1 vs both 0+1), the factor (2 vs [5,4,3,2]), or the absence of LOCAL?
-- Does gfx1100 (RDNA3) tolerate UPCAST(1,2) because its larger elements_per_thread provides more layout flexibility?
-- Would UPCAST(0,2) + UPCAST(1,2) (both axes, smaller factors) be safe on gfx12?
+2. **swizzle lane mapping** — RDNA4 skips r2 in operand upcast dimensions:
+   - RDNA3 A operand upcast: `('r1','r2','r3')` — sequential
+   - RDNA4 A operand upcast: `('r0','r1','r3')` — skips r2
+   - RDNA3 B operand upcast: `('r1','r2','r3')` — sequential
+   - RDNA4 B operand upcast: `('r0','r1','r3')` — skips r2
 
-**Trajectory:** OSCILLATORY. The register pressure theory was a plausible but incomplete explanation. The real constraint on gfx12 is WMMA tile layout sensitivity — a deeper investigation into RDNA4's WMMA operand layout rules is needed, ideally with AMD ISA documentation.
+3. **Permutation order** — fundamentally different lane-to-axis mapping:
+   - RDNA3 A: `(4,5,6,7,0,9,10,11,1,2,3,8)`
+   - RDNA4 A: `(4,5,6,7,8,9,11,10,0,1,2,3)`
 
-**Resolution:** PR #16107 now falls back to the *entire* original post-TC heuristic on gfx12 (UPCAST M+N + LOCAL N — verbatim pre-fix behavior). The new UPCAST N + UNROLL K strategy only applies to non-gfx12 platforms.
+**Root cause mechanism:** When `apply_opt(Opt(OptOps.TC, ...))` sets up WMMA, it creates upcast axes via `tc.opts` and maps operands to lanes via `tc.swizzle`. The TC setup at `postrange.py:288-289` computes `tc_upcast_axes` from `base_upcast_axes[:log2(elements_per_thread[i])]`:
+- RDNA3: 4 upcast axes per operand (log2(16)=4), includes r3
+- RDNA4: 3 upcast axes per operand (log2(8)=3), excludes r3
 
-The gfx12-specific investigation (safe UNROLL factor, WMMA tile constraints) remains open but is not blocking — the PR ships with the conservative fallback.
+When the heuristic applies UPCAST(1,2) after TC, it further splits axis 1 (M dimension). This changes which schedule axes map to which WMMA operand lanes. On RDNA3, the larger element count (16) provides enough lane-mapping flexibility to absorb the change. On RDNA4, with only 8 elements per thread and a non-sequential lane mapping (skipping r2), the post-TC UPCAST violates the operand-to-lane assignment that `tc.swizzle` requires.
+
+The old heuristic's UPCAST M+N pattern works because it matches the structure the TC opts/swizzle expect — both axes are upcasted in the order and factors that preserve the lane mapping. Changing to N-only UPCAST breaks the expected layout.
+
+**Trajectory:** DIVERGENT for root cause identification. The mechanism is deductive (traced through code), not inductive (measured). Confidence: 90%.
+
+**Open edges (testable via CI):**
+- H0.6b: Would `UPCAST(0,2) + UPCAST(1,2)` (both axes, matching the old pattern's axis coverage) be safe on gfx12 while still enabling UNROLL(0,4)?
+- H0.6c: What post-TC opts would actually improve gfx12 performance without violating lane constraints? The answer requires understanding which UPCAST configurations preserve RDNA4's swizzle invariants.
+- H0.6d: Is there a general rule: "post-TC UPCAST must cover ALL operand axes that appear in `tc.opts`, not a subset"?
+
+**Resolution:** PR #16107 falls back to the *entire* original post-TC heuristic on gfx12 (UPCAST M+N + LOCAL N — verbatim pre-fix behavior). The new UPCAST N + UNROLL K strategy only applies to non-gfx12 platforms. This is the correct conservative fix given the lane mapping constraints.
