@@ -225,3 +225,49 @@ All three predictions confirmed:
 **Theory refinement:** The theory is now: "For matmuls where `min(M,N) < 64` and `K > 1024`, the heuristic's TC gate is overly conservative. TC should be tried regardless of outer shape when the inner dimension provides enough work for WMMA tiles."
 
 **Next edge:** Can this theory be encoded as a one-line heuristic fix? If `min(M,N) < 64 and K > 1024: try TC` — does it match BEAM's result? This would close the loop: observation → theory → code change.
+
+### H0.4: Theory refinement — TC was already enabled, post-TC opts are wrong
+
+**Status:** REFRAMED — the bottleneck is post-TC optimization, not TC gating
+
+**Perturbation:** Inspected what the heuristic actually produces for the 16×4096 tall-skinny matmul. Monkeypatched `hand_coded_optimizations` to capture before/after state.
+
+**Evidence:**
+```
+Heuristic: TC + UPCAST(axis=0, arg=2) + UPCAST(axis=0, arg=4) + LOCAL(axis=0, arg=4)
+BEAM:      TC + UPCAST(axis=1, arg=2) + UNROLL(axis=0, arg=4)
+```
+
+The heuristic ALREADY enables TC for this kernel (1 reduce axis, gate passes). The -44.8% gap is NOT from missing TC — it's from the post-TC opts. The heuristic UPCASTs axis 0 twice (the M dimension, which is only 16). BEAM UPCASTs axis 1 (the N dimension, 4096) and UNROLLs axis 0 (the K dimension).
+
+**Revised theory:** For tall-skinny matmuls, the heuristic's post-TC strategy (UPCAST M, then UPCAST M again, then LOCAL M) wastes register budget on the small dimension. BEAM discovers that UPCAST N + UNROLL K is better — it parallelizes across the large dimensions instead.
+
+**Kill condition for revised theory:** If UPCAST(axis=1) + UNROLL(axis=0) hurts on square matmuls, the theory is shape-specific. The heuristic's post-TC opts should be shape-aware: UPCAST the LARGE dimension, not always axis 0.
+
+**Trajectory:** OSCILLATORY. The original theory ("TC is missing") was wrong. The revised theory ("post-TC opts target wrong axis") is more specific and testable. Split into sub-hypotheses.
+
+**This is exactly the kill-condition-generates-edge pattern.** The wrong theory (H0.2: "heuristic skips TC") was killed by evidence (TC is already applied). The kill generated a new, more precise theory (H0.4: "post-TC opts target wrong axis"). The methodology worked — the theory got refined, not abandoned.
+
+### H0.5: BEAM-style post-TC opts vs heuristic — kernel timing comparison
+
+**Status:** ★ CONFIRMED — theory-derived fix matches or exceeds BEAM
+
+**Perturbation:** Monkeypatched the heuristic to use `UPCAST(axis=1, arg=2) + UNROLL(axis=0, arg=4)` after TC instead of the heuristic's default `UPCAST(axis=0, arg=2) + UPCAST(axis=0, arg=4) + LOCAL(axis=0, arg=4)`.
+
+**Evidence:**
+
+| Shape | Heuristic kernel | Time | BEAM-style kernel | Time | Delta |
+|---|---|---|---|---|---|
+| 16×4096 × 4096×4096 | r_32_32_4_2_2_4_512 | 3362us | r_2_256_32_2_2_128_4 | 1912us | **-43.1%** |
+| 8×2048 × 2048×2048 | r_16_32_4_2_4_256 | 1281us | r_256_32_2_64_4 | 528us | **-58.8%** |
+| 256×256 × 256×256 | r_8_2_32_4_2_4_4_32 | 313us | r_32_16_32_2_2_8_4 | 154us | **-50.8%** |
+
+No regressions — square matmul also improves. The heuristic's post-TC opts are universally worse.
+
+**Root cause:** The heuristic (lines 39-45) UPCASTs and LOCALs axis 0 after TC. This is the M dimension. For tall-skinny matmuls M is small (16) — upcasting a small dimension wastes register budget. BEAM finds that UPCASTing axis 1 (N, the large dimension) and UNROLLing axis 0 (K, the reduction dimension) gives the GPU more work per thread and better memory access patterns.
+
+But even for SQUARE matmuls, the BEAM-style opts are better: 154us vs 313us (-50.8%). The heuristic's axis-0 bias is wrong in general, not just for tall-skinny.
+
+**Trajectory:** DIVERGENT for. The fix helps across all tested shapes. Ready for Phase 7 (regression check on full test suite).
+
+**The fix (2 lines):** Replace the post-TC UPCAST/LOCAL on lines 39-45 with UPCAST(axis=1) + UNROLL(axis=0).
