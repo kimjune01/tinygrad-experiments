@@ -271,3 +271,20 @@ But even for SQUARE matmuls, the BEAM-style opts are better: 154us vs 313us (-50
 **Trajectory:** DIVERGENT for. The fix helps across all tested shapes. Ready for Phase 7 (regression check on full test suite).
 
 **The fix (2 lines):** Replace the post-TC UPCAST/LOCAL on lines 39-45 with UPCAST(axis=1) + UNROLL(axis=0).
+
+### H0.6: AMD gfx1201 regression — UNROLL(0,4) produces incorrect WMMA results
+
+**Status:** CONFIRMED — the fix is AMD-unsafe
+
+**Evidence:** PR #16104 CI failure: `test_gemm_fp16` on AMD gfx1201, 64×64 matmul. 50% of elements wrong, max error 399.5. First 16 columns correct, columns 16+ wildly wrong — the UNROLL misaligns WMMA tile boundaries on this GPU.
+
+Passes on: Metal, CUDA, AMD gfx1100, AMD gfx950, CPU, WebGPU, DSP.
+Fails on: AMD gfx1201 (both amd and amdllvm backends).
+
+**Decomposition:** Dropping LOCAL alone (keeping original UPCASTs, no UNROLL) produces 3351us vs 3376us — no improvement. The entire -43% to -51% came from UNROLL(0,4). The UPCAST axis order doesn't matter.
+
+**Trajectory:** OSCILLATORY. The fix helps Metal but breaks AMD gfx1201. Classic oscillatory — helps one target, hurts another. Split into:
+- H0.6a: Why does UNROLL(0,4) misalign WMMA on gfx1201 specifically? (gfx1100 and gfx950 pass)
+- H0.6b: Is there a safe UNROLL factor (2 instead of 4)? Or a different post-TC strategy that helps both?
+
+**PR #16104 must be reverted or made backend-conditional.** The investigation re-enters Phase 2 with the oscillatory result.
