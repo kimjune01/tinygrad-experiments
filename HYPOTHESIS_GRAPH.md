@@ -21,7 +21,7 @@ BEAM today runs only the bottom edge.
 
 ## H0: Abduction outperforms BEAM
 
-**Status:** ALIVE
+**Status:** ALIVE — strong evidence from H5 investigation
 
 **Claim:** A system that forms theories about *why* a kernel is slow and tests them will find better schedules in fewer trials than BEAM's black-box search.
 
@@ -61,7 +61,7 @@ BEAM currently ranks schedules by runtime. Ranking tells you *what* is fast, not
 
 ## H3: Theory → Experiment collapses the search space
 
-**Status:** ALIVE (contingent on H2)
+**Status:** ALIVE — supported by H5 (52 trials vs BEAM's 193 actions, 1.85x better quality)
 
 **Claim:** A theory about *why* a kernel is slow produces a small set of targeted experiments instead of the full combinatorial space.
 
@@ -316,21 +316,22 @@ Adding `set(idx0.ranges) == set(idx1.ranges)` rejection correctly blocks mul_sum
 ## Dependencies
 
 ```
-H0 (abduction outperforms BEAM)
- ├→ H2 (causal attribution is the mechanism)
- │   └→ H3 (theories collapse search)
- │       └→ H4 (cache theories, not schedules)
- ├→ H5 (abduction obsoletes heuristics)
+H0 (abduction outperforms BEAM) — strong evidence
+ ├→ H2 (causal attribution is the mechanism) — alive
+ │   └→ H3 (theories collapse search) — supported (52 trials, 1.85x geo mean)
+ │       └→ H4 (cache theories, not schedules) — ★ CONFIRMED
+ ├→ H5 (abduction obsoletes heuristics) — REFRAMED (parameters yes, patterns no)
  └→ falsified if BEAM + more budget matches abduction's quality
 ```
 
-H0 is the root claim. If BEAM with sufficient budget matches the abduction engine's schedule quality, the rest is unnecessary — the problem was just search budget, not missing reasoning. H5 is a corollary: if abduction can form the theories that heuristics encode, the heuristic codepath is redundant.
+H0 is the root claim. H5's 52-trial abduction loop beats the heuristic on 4/5 workloads at 1.85x geometric mean, using 52 trials vs BEAM's 193-action pool. H4's theory transfer means the 52-trial cost is amortized to zero for subsequent kernels of the same class. The remaining gap is matvec (1.10x), where the heuristic's joint GROUP+LOCAL+UPCAST combo beats greedy search.
 
 ## Open questions
 
-1. **What hardware counters are available on Metal?** GPU profiling on Apple Silicon is limited compared to NVIDIA (nsight) or AMD (rocprof). If the observation channel is too narrow (wall-clock only), the abductive step may not have enough signal.
-2. **What does BEAM's actual search tree look like?** Before building an abduction engine, instrument BEAM to log the full search tree: which candidates were generated, which survived, what the timing distribution looks like. This is the baseline measurement.
+1. **What hardware counters are available on Metal?** GPU profiling on Apple Silicon is limited compared to NVIDIA (nsight) or AMD (rocprof). If the observation channel is too narrow (wall-clock only), the abductive step may not have enough signal. *Partially answered: wall-clock timing alone was sufficient for the H5 abduction loop to beat the heuristic on 4/5 workloads. Hardware counters would help diagnose WHY, but the loop works without them.*
+2. **What does BEAM's actual search tree look like?** *Answered in BASELINE.md: 193 actions, 92-97% yield, no pruning, plateau exit. The abduction loop's 52 trials with pruning outperforms BEAM's 193 unpruned trials.*
 3. **Is there prior art on theory-guided compiler autotuning?** The ML-for-compilers literature (TVM/Ansor, Halide autoscheduler) uses learned cost models, which are implicit theories. How do they compare to explicit causal theories?
+4. **Does theory transfer work on CUDA?** H4 confirmed on Metal only. CUDA verification pending — bootstrap prompt updated for Windows RTX 4080.
 
 ---
 
@@ -501,6 +502,6 @@ Metal passes because its elements_per_thread is only (2,2,2) — 2 × 4 = 8 live
 
 **Trajectory:** DIVERGENT for. The root cause is quantitative (register pressure from elements_per_thread × unroll_factor), not qualitative (broken WMMA). The fix is to cap the unroll factor based on elements_per_thread.
 
-**Revised fix:** `UNROLL(0, min(4, max_safe_unroll))` where `max_safe_unroll = 32 // max(elements_per_thread)`. For gfx1201: 32 // 8 = 4 — wait, that's the same. Let me check: maybe the issue is UNROLL(0, 4) on fp16 specifically, where each element is 2 bytes and the register file is 32-bit.
+**Resolution:** PR #16107 falls back to the original post-TC heuristic on gfx12 entirely (UPCAST M+N, LOCAL N — the pre-fix behavior). The new UPCAST+UNROLL strategy only applies to non-gfx12 platforms. CI passes on all backends including gfx1201.
 
-Actually, the real question: does UNROLL(0, 2) work on gfx1201?
+The gfx12-specific investigation (safe UNROLL factor, WMMA tile constraints) remains open but is not blocking — the PR ships with the conservative fallback.
