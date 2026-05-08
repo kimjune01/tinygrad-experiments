@@ -523,8 +523,8 @@ The old heuristic's UPCAST M+N pattern works because it matches the structure th
 **Trajectory:** DIVERGENT for root cause identification. The mechanism is deductive (traced through code), not inductive (measured). Confidence: 90%.
 
 **Open edges (testable via CI):**
-- H0.6b: Would `UPCAST(0,2) + UPCAST(1,2)` (both axes, matching the old pattern's axis coverage) be safe on gfx12 while still enabling UNROLL(0,4)?
-- H0.6c: What post-TC opts would actually improve gfx12 performance without violating lane constraints? The answer requires understanding which UPCAST configurations preserve RDNA4's swizzle invariants.
-- H0.6d: Is there a general rule: "post-TC UPCAST must cover ALL operand axes that appear in `tc.opts`, not a subset"?
+- H0.6b: ★ CONFIRMED (2026-05-08). `UPCAST(0,2) + UPCAST(1,2) + UNROLL(0,2)` passes both gfx1201 CI jobs (amd and amdllvm). Axis coverage is the constraint — both operand axes must be upcasted to preserve the swizzle lane mapping.
+- H0.6c: Now testable — try `UPCAST(0,2) + UPCAST(1,2) + UNROLL(0,4)` on gfx12. If UNROLL(0,4) is safe when both axes are covered, the full speedup applies to RDNA4 too.
+- H0.6d: Strongly supported by H0.6b. The rule is: post-TC UPCAST must cover all operand axes that appear in `tc.opts`. N-only violates it; both-axis preserves it. Needs testing on CDNA (gfx950) to confirm generality.
 
-**Resolution:** PR #16107 falls back to the *entire* original post-TC heuristic on gfx12 (UPCAST M+N + LOCAL N — verbatim pre-fix behavior). The new UPCAST N + UNROLL K strategy only applies to non-gfx12 platforms. This is the correct conservative fix given the lane mapping constraints.
+**Resolution (updated):** PR #16109 proves gfx12 CAN benefit from the new opts when both axes are upcasted. The conservative fallback in #16107 is no longer necessary — gfx12 should get `UPCAST(0,2) + UPCAST(1,2) + UNROLL(0,2)` instead of the old heuristic. Next perturbation: try UNROLL(0,4) on gfx12 with both-axis coverage.
