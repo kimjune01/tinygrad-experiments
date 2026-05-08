@@ -33,6 +33,14 @@
 | 256x256 @ 256x256 | 1500 | 1401 | `r_8_4_8_16_4_4_64_4` | -6.6% (noise) |
 | 8x2048 @ 2048x2048 | 661 | 661 | `r_32_2_16_4_4_512_4` | neutral |
 
+## Linearizer Tests (`post-tc-upcast-fix`)
+
+```
+18 passed, 7 skipped, 2 deselected, 1 xfailed in 2.13s
+```
+
+2 tests deselected (`test_arg_acc_dtype`, `test_sum_acc_dtype`) — both fail with `KeyError: dtypes.bfloat16` in the PTX renderer. Confirmed pre-existing: same failure on `skip-root-op-check` baseline. Not caused by the PR.
+
 ## Conclusion
 
-Kernel shapes are identical between baseline and fix on all three matmul sizes. The heuristic change does not alter CUDA's kernel selection. The 256x256 dip is measurement noise (same kernel, same shape). PR is safe on CUDA.
+Kernel shapes are identical between baseline and fix on all three matmul sizes. The heuristic change does not alter CUDA's kernel selection. The 256x256 dip is measurement noise (same kernel, same shape). All non-bfloat16 linearizer tests pass. PR is safe on CUDA.
